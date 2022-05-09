@@ -16,3 +16,7 @@ Task 7: Use Redis for the v2 guestbook application instead of an in-memory datas
 Task 8: Submit entries to the guestbook and have their tone analyzed. Some simple sentences will not have a tone detected. Ensure that you submit something complex enough so that its tone is detected.(2 points)
 
 Task 9: Create a Horizontal Pod Autoscaler that shows guestbook as the scale target, the current and desired replicas as three, and the last scale time as the time the deployment was scaled up to three replicas (4 points)
+
+
+
+To start, you will deploy a simple guestbook application that uses in-memory storage to retain the guestbook entries. Afterward, you will deploy a multi-tier web application that consists of a web front end, a Redis master and replicated slaves for storage, as well as an analyzer service that analyzes the tone of entries left in the guestbook. In order to utilize the analyzer service, you will have to create a free instance of Tone Analyzer in your personal IBM Cloud account.

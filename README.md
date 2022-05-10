@@ -44,8 +44,11 @@ docker push us.icr.io/$MY_NAMESPACE/guestbook:v1. - push the image to ibmcloud c
 
 oc tag us.icr.io/$MY_NAMESPACE/guestbook:v1 guestbook:v1 --reference-policy=local --scheduled  -  Create an image stream that points to your image in IBM Cloud Container Registry. With the --reference-policy=local option, a copy of the image from IBM Cloud Container Registry is imported into the local cache of the internal registry and made available to the cluster's projects as an image stream. The --schedule option sets up periodic importing of the image from IBM Cloud Container Registry into the internal registry. The default frequency is 15 minutes
 
+
 Open the OpenShift web console using the link at the top of the lab environment. From the Developer perspective, click the +Add button to add a new application to this project. Click the Container Image option so that we can deploy the application using an image in the internal registry.
 Under Image, switch to "Image stream tag from internal registry". Select your project, and the image stream and tag you just created (guestbook and v1, respectively). You should have only have one option for each of these fields anyway since you only have access to a single project and you only created one image stream and one image stream tag. Keep all the default values and hit Create at the bottom. This will create the application and take you to the Topology view. From the Topology view, click the guestbook Deployment. This should take you to the Resources tab for this Deployment, where you can see the Pod that is running the application as well as the Service and Route that expose it. Click the Route location (the link) to view the guestbook in action. Try out the guestbook by putting in a few entries. You should see them appear above the input box after you hit Submit.
+
+![](https://github.com/saiswaruprath/ibmkubernetes/blob/main/images/Screen%20Shot%202022-05-07%20at%201.02.59%20PM.png)
 
 
 # Update the guestbook
@@ -62,6 +65,8 @@ Click Builds > Image Streams in the navigation from administrator in openshift c
 # Guestbook storage
 
 From the guestbook in the browser, click the /info link beneath the input box. This is an information endpoint for the guestbook. Return to the guestbook application in the browser by clicking the Route location again. You should see that your previous entries appear no more. This is because the guestbook was restarted when your update was deployed in the last section. We need a way to persist the guestbook entries even after restarts.
+
+![](https://github.com/saiswaruprath/ibmkubernetes/blob/main/images/Screen%20Shot%202022-05-07%20at%201.03.19%20PM.png)
 
 # Delete the guestbook
 In order to deploy a more complex version of the guestbook, delete this simple version.
@@ -81,9 +86,13 @@ oc apply -f redis-master-service.yaml.  - create redis master service
 oc apply -f redis-slave-deployment.yaml  - create redis slave deployment 
 oc apply -f redis-slave-service.yaml.   - create redis slave service
 
+![](https://github.com/saiswaruprath/ibmkubernetes/blob/main/images/Screen%20Shot%202022-05-07%20at%201.11.16%20PM.png)
+
 # Deploy v2 guestbook app
 
 Click the +Add button to add a new application to this project in OpenShift. Click the From Dockerfile option. Paste the below URL in the Git Repo URL box. - https://github.com/ibm-developer-skills-network/guestbook . leave the rest and click on create. Since we gave OpenShift a Dockerfile, it will create a BuildConfig and a Build that will build an image using the Dockerfile, push it to the internal registry, and use that image for a Deployment. In the Resources tab, click the Route location to load the guestbook in the browser. Notice that the header says "Guestbook - v2" instead of "Guestbook - v1". From the guestbook in the browser, click the /info link beneath the input box. Notice that it now gives information on Redis since we're no longer using the in-memory datastore.
+
+![](https://github.com/saiswaruprath/ibmkubernetes/blob/main/images/Screen%20Shot%202022-05-07%20at%201.12.29%20PM.png)
 
 # Login to IBM CLOUD
 
@@ -104,9 +113,12 @@ docker build . -t us.icr.io/$MY_NAMESPACE/analyzer:v1 && docker push us.icr.io/$
 
   oc apply -f analyzer-deployment.yaml - create analyzer deployment
   oc apply -f analyzer-service.yaml- create analyzer service
+
+  ![](https://github.com/saiswaruprath/ibmkubernetes/blob/main/images/Screen%20Shot%202022-05-07%20at%201.24.52%20PM.png)
   
   
 Return to the guestbook in the browser, refresh the page, and submit a new entry. You should see your entry appear along with a tone analysis.
+![](https://github.com/saiswaruprath/ibmkubernetes/blob/main/images/Screen%20Shot%202022-05-07%20at%201.27.17%20PM.png)  
   
   
   

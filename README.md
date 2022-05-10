@@ -49,7 +49,67 @@ Under Image, switch to "Image stream tag from internal registry". Select your pr
 
 
 # Update the guestbook
+Use the Explorer to edit index.html in the public directory. Let's edit the title to be more specific. On line number 12, that says <h1>Guestbook - v1</h1>, change it to include your name. Something like <h1>Alex's Guestbook - v1</h1>.
 
+docker build . -t us.icr.io/$MY_NAMESPACE/guestbook:v1 && docker push us.icr.io/$MY_NAMESPACE/guestbook:v1. - Build and push the app again using the same tag. This will overwrite the previous image.
+
+
+oc import-image guestbook:v1 --from=us.icr.io/$MY_NAMESPACE/guestbook:v1 --confirm
+
+Click Builds > Image Streams in the navigation from administrator in openshift console and check in history for edits. Return to the Developer perspective. View the guestbook in the browser again.  You should see your new title on this page! OpenShift imported the new version of our image, and since the Deployment points to the image stream, it began running this new version as well.
+
+
+# Guestbook storage
+
+From the guestbook in the browser, click the /info link beneath the input box. This is an information endpoint for the guestbook. Return to the guestbook application in the browser by clicking the Route location again. You should see that your previous entries appear no more. This is because the guestbook was restarted when your update was deployed in the last section. We need a way to persist the guestbook entries even after restarts.
+
+# Delete the guestbook
+In order to deploy a more complex version of the guestbook, delete this simple version.
+
+# Deploy Redis master and slave
+
+## This application uses the v2 version of the guestbook web front end and adds on 1) a Redis master for storage, 2) a replicated set of Redis slaves, and 3) a Python Flask application that calls a Watson Natural Language Understanding service deployed in IBM Cloud to analyze the tone. For all of these components, there are Kubernetes Deployments, Pods, and Services. One of the main concerns with building a multi-tier application on Kubernetes is resolving dependencies between all of these separately deployed components.
+
+## In a multi-tier application, there are two primary ways that service dependencies can be resolved. The v2/guestbook/main.go code provides examples of each. For Redis, the master endpoint is discovered through environment variables. These environment variables are set when the Redis services are started, so the service resources need to be created before the guestbook Pods start. For the analyzer service, an HTTP request is made to a hostname, which allows for resource discovery at the time when the request is made. Consequently, we'll follow a specific order when creating the application components. First, the Redis components will be created, then the guestbook application, and finally the analyzer microservice.
+
+
+oc apply -f redis-master-deployment.yaml  - create redis master deployment
+oc get deployments
+oc get pods. 
+
+oc apply -f redis-master-service.yaml.  - create redis master service
+oc apply -f redis-slave-deployment.yaml  - create redis slave deployment 
+oc apply -f redis-slave-service.yaml.   - create redis slave service
+
+# Deploy v2 guestbook app
+
+Click the +Add button to add a new application to this project in OpenShift. Click the From Dockerfile option. Paste the below URL in the Git Repo URL box. - https://github.com/ibm-developer-skills-network/guestbook . leave the rest and click on create. Since we gave OpenShift a Dockerfile, it will create a BuildConfig and a Build that will build an image using the Dockerfile, push it to the internal registry, and use that image for a Deployment. In the Resources tab, click the Route location to load the guestbook in the browser. Notice that the header says "Guestbook - v2" instead of "Guestbook - v1". From the guestbook in the browser, click the /info link beneath the input box. Notice that it now gives information on Redis since we're no longer using the in-memory datastore.
+
+# Login to IBM CLOUD
+
+We need to store these credentials in a Kubernetes secret in order for our analyzer microservice to utilize them.
+
+ibmcloud login -u <your_email_address> 
+
+ibmcloud target -g <resource_group>
+
+Use the Explorer to edit binding-hack.sh. The path to this file is guestbook/v2/binding-hack.sh. You need to insert the name of your IBM Cloud Natural Language Understanding service where it says <your nlu service name>. You need to insert your OpenShift project where it says <my_project>
+  
+Run the script to create a Secret containing credentials for your Natural Language Understanding service.
+./binding-hack.sh.
+  
+# Deploy the analyzer microservice 
+  
+docker build . -t us.icr.io/$MY_NAMESPACE/analyzer:v1 && docker push us.icr.io/$MY_NAMESPACE/analyzer:v1. - build and push analyzer image
+
+  oc apply -f analyzer-deployment.yaml - create analyzer deployment
+  oc apply -f analyzer-service.yaml- create analyzer service
+  
+  
+Return to the guestbook in the browser, refresh the page, and submit a new entry. You should see your entry appear along with a tone analysis.
+  
+  
+  
 
 
 

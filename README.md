@@ -32,3 +32,24 @@ Guestbook is a simple, multi-tier web application that we will build and deploy 
 There are two versions of this application. Version 1 (in the v1 directory) is the simple application itself, while version 2 (in the v2 directory) extends the application by adding additional features that leverage the Watson Natural Language Understanding service.
 
 We will deploy and manage this entire application on OpenShift.
+
+
+# Build the guestbook app
+docker build . -t us.icr.io/$MY_NAMESPACE/guestbook:v1   - build the guestbook app
+
+docker push us.icr.io/$MY_NAMESPACE/guestbook:v1. - push the image to ibmcloud container registry
+
+
+# Deploy guestbook app from the OpenShift internal registry
+
+oc tag us.icr.io/$MY_NAMESPACE/guestbook:v1 guestbook:v1 --reference-policy=local --scheduled  -  Create an image stream that points to your image in IBM Cloud Container Registry. With the --reference-policy=local option, a copy of the image from IBM Cloud Container Registry is imported into the local cache of the internal registry and made available to the cluster's projects as an image stream. The --schedule option sets up periodic importing of the image from IBM Cloud Container Registry into the internal registry. The default frequency is 15 minutes
+
+Open the OpenShift web console using the link at the top of the lab environment. From the Developer perspective, click the +Add button to add a new application to this project. Click the Container Image option so that we can deploy the application using an image in the internal registry.
+Under Image, switch to "Image stream tag from internal registry". Select your project, and the image stream and tag you just created (guestbook and v1, respectively). You should have only have one option for each of these fields anyway since you only have access to a single project and you only created one image stream and one image stream tag. Keep all the default values and hit Create at the bottom. This will create the application and take you to the Topology view. From the Topology view, click the guestbook Deployment. This should take you to the Resources tab for this Deployment, where you can see the Pod that is running the application as well as the Service and Route that expose it. Click the Route location (the link) to view the guestbook in action. Try out the guestbook by putting in a few entries. You should see them appear above the input box after you hit Submit.
+
+
+# Update the guestbook
+
+
+
+
